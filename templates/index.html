@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GitHub Webhook Events</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+          Cantarell, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 2em;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        opacity: 0.9;
+        font-size: 0.9em;
+      }
+
+      .status {
+        padding: 15px 30px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .status-indicator {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #28a745;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      .events-container {
+        padding: 30px;
+        max-height: 600px;
+        overflow-y: auto;
+      }
+
+      .event-item {
+        padding: 20px;
+        margin-bottom: 15px;
+        background: #f8f9fa;
+        border-left: 4px solid #667eea;
+        border-radius: 6px;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+
+      .event-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .event-item.push {
+        border-left-color: #28a745;
+      }
+
+      .event-item.pull_request {
+        border-left-color: #ffc107;
+      }
+
+      .event-item.merge {
+        border-left-color: #dc3545;
+      }
+
+      .event-text {
+        font-size: 1.1em;
+        color: #333;
+        line-height: 1.6;
+      }
+
+      .event-meta {
+        margin-top: 8px;
+        font-size: 0.85em;
+        color: #6c757d;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+      }
+
+      .empty-state svg {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 20px;
+        opacity: 0.5;
+      }
+
+      /* Scrollbar styling */
+      .events-container::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .events-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+
+      .events-container::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+      }
+
+      .events-container::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🚀 GitHub Webhook Events</h1>
+        <p>Real-time activity feed from your repository</p>
+      </div>
+
+      <div class="status">
+        <div class="status-indicator">
+          <span class="status-dot"></span>
+          <span>Polling active</span>
+        </div>
+        <div id="lastUpdate">Last update: Never</div>
+      </div>
+
+      <div class="events-container" id="eventsContainer">
+        <div class="empty-state">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <p>Waiting for events...</p>
+          <p style="font-size: 0.9em; margin-top: 10px">
+            Events will appear here as they occur
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='poll.js') }}"></script>
+  </body>
+</html>
