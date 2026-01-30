@@ -31,6 +31,15 @@ def create_app():
     # Initialize extensions
     # Flask-PyMongo automatically uses MONGO_URI from config
     mongo.init_app(app)
+
+    # Test MongoDB connection
+    try:
+        mongo.db.command('ping')
+        print(f"✓ MongoDB connected successfully to: {app.config.get('MONGO_URI', 'default')}")
+    except Exception as e:
+        print(f"✗ MongoDB connection failed: {e}")
+        # Return the value of MONGO_URI from config, or the string 'default' if that key isn’t set.
+        print(f"MONGO_URI: {app.config.get('MONGO_URI', 'default')}")
     
     # Register blueprints
     app.register_blueprint(webhook)
