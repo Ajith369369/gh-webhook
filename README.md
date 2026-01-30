@@ -47,19 +47,21 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-4. **Configure MongoDB:**
+4. **Configure environment variables:**
 
-The application uses MongoDB to store webhook events. By default, it connects to:
-
-```
-mongodb://localhost:27017/github_webhook
-```
-
-You can override this by setting the `MONGO_URI` environment variable:
+Only **MONGO_URI** is required. Copy `.env.example` to `.env` and set your MongoDB connection string:
 
 ```bash
-export MONGO_URI="mongodb://localhost:27017/github_webhook"
+cp .env.example .env
+# Edit .env and set MONGO_URI (e.g. your Atlas connection string or mongodb://localhost:27017/github_webhook)
 ```
+
+**Required:**
+- **MONGO_URI** – MongoDB connection string (e.g. Atlas URI or `mongodb://localhost:27017/github_webhook`). You must set this for a remote DB; if unset, the app falls back to `mongodb://localhost:27017/github_webhook` for local MongoDB.
+
+**Optional (have defaults):**
+- **SECRET_KEY** – Flask secret key. Default: `dev-secret-key-change-in-production`. Set a strong value in production.
+- **FLASK_DEBUG** – Enable Flask debug mode. Default: `False`. Set to `true` (lowercase) to enable.
 
 5. **Run the Flask application:**
 
@@ -327,9 +329,12 @@ This project follows enterprise-grade engineering practices:
 
 ## Environment Variables
 
-- `MONGO_URI`: MongoDB connection string (default: `mongodb://localhost:27017/github_webhook`)
-- `SECRET_KEY`: Flask secret key (default: dev key - change in production)
-- `FLASK_DEBUG`: Enable debug mode (default: `False`)
+**Required:**
+- **MONGO_URI** – MongoDB connection string. The only variable you must set for the app to work (e.g. Atlas URI). If unset, the app falls back to `mongodb://localhost:27017/github_webhook` for local MongoDB.
+
+**Optional (defaults):**
+- **SECRET_KEY** – Flask secret key. Default: `dev-secret-key-change-in-production`. Override with a strong value in production.
+- **FLASK_DEBUG** – Enable Flask debug mode. Default: `False`. Set to `true` (lowercase) to enable.
 
 ## Troubleshooting
 
