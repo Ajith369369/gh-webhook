@@ -215,13 +215,71 @@ To receive events from your `gh-action` repository:
 6. Select events: `push`, `pull_request`
 7. Save the webhook
 
-**Note:** For local development, use a tool like [ngrok](https://ngrok.com/) to expose your local server:
+**Note:** For local development, use a tunneling tool to expose your local server. Here are two popular options:
+
+#### Option 1: Using Pinggy (No download required)
+
+[Pinggy](https://pinggy.io/) is a free tunneling service that uses SSH and doesn't require downloading any binaries. It provides both HTTP and HTTPS URLs automatically.
+
+**Windows PowerShell:**
+```powershell
+ssh -p 443 -R0:127.0.0.1:5000 -L4300:127.0.0.1:4300 qr@free.pinggy.io
+```
+
+**Windows Command Prompt:**
+```cmd
+ssh -p 443 -R0:127.0.0.1:5000 -L4300:127.0.0.1:4300 qr@free.pinggy.io
+```
+
+**Linux/Mac:**
+```bash
+ssh -p 443 -R0:localhost:5000 -L4300:localhost:4300 qr@free.pinggy.io
+```
+
+**Important Notes:**
+- When prompted for a password, just press Enter (blank password is fine)
+- Pinggy will display two URLs: HTTP and HTTPS - **always use the HTTPS URL** for GitHub webhooks
+- Your tunnel will expire in 60 minutes on the free tier (upgrade to Pinggy Pro for persistent URLs)
+- Use `127.0.0.1` instead of `localhost` on Windows to avoid connection issues
+
+**Troubleshooting SSH Permissions Error:**
+
+If you encounter the error: `Bad owner or permissions on C:\\Users\\USERNAME/.ssh/config`
+
+**Quick Fix (Recommended):**
+Add `-F NUL` to ignore the SSH config file:
+```powershell
+ssh -F NUL -p 443 -R0:127.0.0.1:5000 -L4300:127.0.0.1:4300 qr@free.pinggy.io
+```
+
+**Alternative Fix:**
+Temporarily rename your SSH config file:
+```powershell
+# Backup and rename the config file
+Rename-Item $env:USERPROFILE\.ssh\config $env:USERPROFILE\.ssh\config.backup
+
+# After using Pinggy, restore it if needed:
+# Rename-Item $env:USERPROFILE\.ssh\config.backup $env:USERPROFILE\.ssh\config
+```
+
+**Example Pinggy Output:**
+```
+http://qledd-59-182-184-44.a.free.pinggy.link
+https://qledd-59-182-184-44.a.free.pinggy.link
+```
+
+Use the HTTPS URL in your GitHub webhook configuration:
+- Payload URL: `https://your-pinggy-url.a.free.pinggy.link/webhook/github`
+
+#### Option 2: Using ngrok
+
+Alternatively, you can use [ngrok](https://ngrok.com/):
 
 ```bash
 ngrok http 5000
 ```
 
-Then use the ngrok URL in your webhook configuration.
+Then use the ngrok HTTPS URL in your webhook configuration.
 
 ## Project Structure
 
