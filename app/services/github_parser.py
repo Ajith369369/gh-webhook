@@ -4,7 +4,7 @@ GitHub webhook event parser service.
 This module handles parsing GitHub webhook payloads and extracting
 relevant information for storage in MongoDB.
 """
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Optional, Tuple
 
 
@@ -155,19 +155,16 @@ class GitHubParser:
             str: ISO 8601 formatted UTC timestamp string
         """
         try:
-            # Parse the timestamp (GitHub uses ISO 8601 format)
-            # Handle both with and without timezone
-            if 'T' in timestamp_str:
-                # Remove timezone info if present and parse as UTC
-                timestamp_clean = timestamp_str.split('+')[0].split('Z')[0].split('.')[0]
-                dt = datetime.fromisoformat(timestamp_clean.replace('Z', ''))
-            else:
-                dt = datetime.fromisoformat(timestamp_str)
-            
-            # Ensure UTC timezone and format as ISO 8601 string
-            utc_dt = dt.replace(tzinfo=None)  # Assume UTC if no timezone info
-            return utc_dt.isoformat() + 'Z'
+            # Normalize 'Z' to '+00:00' so fromisoformat parses it (Python < 3.11)
+            normalized = timestamp_str.strip().replace('Z', '+00:00')
+            # Parse with timezone (handles +05:30, +00:00, etc.)
+            dt = datetime.fromisoformat(normalized)
+            # If naive (no timezone), assume UTC
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            # Convert to UTC and format as ISO 8601
+            utc_dt = dt.astimezone(timezone.utc)
+            return utc_dt.strftime('%Y-%m-%dT%H:%M:%SZ')
         except Exception as e:
             print(f"Error parsing timestamp {timestamp_str}: {e}")
-            # Fallback to current UTC time
-            return datetime.utcnow().isoformat() + 'Z'
+            return datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
